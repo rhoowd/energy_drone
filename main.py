@@ -27,63 +27,50 @@ and propose the neural network model for drone's energy consumption
 """
 import config
 import extract_data as ed
-import log_result
+import log_result as log
+import models
+import graph
 
 from keras.models import Sequential
-from keras.layers import Dense
+from sklearn.model_selection import train_test_split
 
 
 FLAGS = config.flags.FLAGS
 
+
 if __name__ == '__main__':
 
-    n_s = FLAGS.n_s
-    n_h = FLAGS.n_h
-
-    xy = ed.extract_data_speed(n_history=n_h, n_sample=n_s, filename=FLAGS.f_n)
-
+    # Load data from file
+    xy = ed.extract_data_speed(n_history=FLAGS.n_h, n_sample=FLAGS.n_s, filename=FLAGS.f_n)
     x_data = xy[:, 0:-1]
     y_data = xy[:, [-1]]
+    log.logger.info("x_shape: " + str(x_data.shape) + ", y_shape:" + str(y_data.shape))
 
-    log_result.logger.info("hello")
-    print "x_shape:", x_data.shape, "; y_shape:", y_data.shape
+    # Split data for test
+    x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=FLAGS.test_size, random_state=FLAGS.seed)
 
-    # create model
+    # Create model
     model = Sequential()
-    model.add(Dense(12, input_dim=FLAGS.n_h, init='uniform', activation='relu'))
-    model.add(Dense(15, init='uniform', activation='relu'))
-    model.add(Dense(15, init='uniform', activation='relu'))
-    model.add(Dense(1, init='uniform', activation='relu'))
-    # Compile model
-    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mean_squared_error'])
+    # models.base_model(model)
+    models.flexible_model(model)
 
-    model.fit(x_data, y_data, nb_epoch=FLAGS.n_e, batch_size=FLAGS.b_s, verbose=FLAGS.verbose)
-    # evaluate the model
+    # Start training
+    model.fit(x_train, y_train, validation_data=(x_test, y_test), nb_epoch=FLAGS.n_e, batch_size=FLAGS.b_s, verbose=FLAGS.verbose)
+
+    # Evaluate the model
+    scores = model.evaluate(x_test, y_test)
+    log.logger.info("MSE(test):\t" + str(scores[1]) + "\t" + log.filename + "\t")
     scores = model.evaluate(x_data, y_data)
-    print("%s: %.2f" % (model.metrics_names[1], scores[1]))
+    log.logger.info("MSE(all):\t" + str(scores[1]) + "\t" + log.filename + "\t")
 
-    est = model.predict(x_data)
+    # Save model
+    model_json = model.to_json()
+    with open("result/model/"+log.filename+".json", "w") as json_file:
+        json_file.write(model_json)  # serialize model to JSON
+    model.save_weights("result/model/"+log.filename+".h5")  # weight
+    print("Saved model done")
 
     # Make graph
     if FLAGS.graph == 1:
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-
-        fig, ax1 = plt.subplots()
-        k = range(1, y_data.shape[0] + 1)
-        ax1.plot(k, y_data, 'b-')
-        ax1.plot(k, est, 'r-')
-        ax1.set_xlabel('time')
-        ax1.set_ylabel('energy', color='b')
-        ax1.tick_params('y', colors='b')
-
-        ax2 = ax1.twinx()
-        ax2.plot(k, xy[:, -2], 'r:')
-        ax2.set_ylabel('velocity', color='r')
-        ax2.tick_params('y', colors='r')
-
-        fig.tight_layout()
-        plt.savefig('plot.pdf')
-
-
+        est = model.predict(x_data)
+        graph.draw_graph(x_data[:, -1], y_data, est)
