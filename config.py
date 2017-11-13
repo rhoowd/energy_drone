@@ -19,5 +19,5 @@ flags.DEFINE_integer("seed", 1, "Random seed for split data set")
 flags.DEFINE_float("test_size", 0.33, "Test data size")
 
 
-flags.DEFINE_integer("verbose", 1, "Print during fit (1) or not (0)")
-flags.DEFINE_integer("graph", 1, "Save graph (1) or not (0)")
+flags.DEFINE_integer("verbose", 0, "Print during fit (1) or not (0)")
+flags.DEFINE_integer("graph", 0, "Save graph (1) or not (0)")

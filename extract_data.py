@@ -14,20 +14,26 @@ def extract_data_speed(n_history=10, n_sample=-1, filename="test2.dat"):
 
     f = open("data/energy/"+filename)
     cnt = 0
+    s_cnt = 0
     v_arr = []
     ret = np.empty((0, n_history + 1))
 
     try:
         for line in f:
+            if line[0] == "s":
+                s_cnt = 0
+                del v_arr[:]
+                continue
             data = json.loads(line)
             if "loc" in data and data['loc']['alt'] > 0:  # verify data
                 cnt += 1
+                s_cnt += 1
                 # get data
                 energy = -1 * data['V'] * data['I']
                 v = math.sqrt(pow(data['vx'], 2) + pow(data['vy'], 2))
                 v_arr.append(v)
 
-                if cnt > n_history:  # make sequence with history
+                if s_cnt > n_history:  # make sequence with history
                     v_arr.pop(0)
                     ret_arr = v_arr[:]
                     ret_arr.append(energy/100000000.0)

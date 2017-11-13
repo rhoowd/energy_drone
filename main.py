@@ -59,9 +59,9 @@ if __name__ == '__main__':
 
     # Evaluate the model
     scores = model.evaluate(x_test, y_test)
-    log.logger.info("MSE(test):\t" + str(scores[1]) + "\t" + log.filename + "\t")
+    log.logger.info("MSE(test):\t" + str(scores[1]) + "\t" + log.filename +" s"+ str(FLAGS.seed) + "\t")
     scores = model.evaluate(x_data, y_data)
-    log.logger.info("MSE(all):\t" + str(scores[1]) + "\t" + log.filename + "\t")
+    log.logger.info("MSE(all):\t" + str(scores[1]) + "\t" + log.filename +" s" + str(FLAGS.seed) + "\t")
 
     # Save model
     model_json = model.to_json()
