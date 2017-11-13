@@ -3,7 +3,7 @@ import json
 import math
 
 
-def extract_data(n_history=10, n_sample=-1, filename="test2.dat"):
+def extract_data_speed(n_history=10, n_sample=-1, filename="test2.dat"):
     """
 
     :param n_history: number of history it output
