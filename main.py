@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # create model
     model = Sequential()
-    model.add(Dense(12, input_dim=30, init='uniform', activation='relu'))
+    model.add(Dense(12, input_dim=FLAGS.n_h, init='uniform', activation='relu'))
     model.add(Dense(15, init='uniform', activation='relu'))
     model.add(Dense(15, init='uniform', activation='relu'))
     model.add(Dense(1, init='uniform', activation='relu'))
@@ -85,3 +85,5 @@ if __name__ == '__main__':
 
         fig.tight_layout()
         plt.savefig('plot.pdf')
+
+
