@@ -40,7 +40,7 @@ if __name__ == '__main__':
     n_s = FLAGS.n_s
     n_h = FLAGS.n_h
 
-    xy = ed.extract_data_speed(n_history=n_h, n_sample=n_s)
+    xy = ed.extract_data_speed(n_history=n_h, n_sample=n_s, filename=FLAGS.f_n)
 
     x_data = xy[:, 0:-1]
     y_data = xy[:, [-1]]
