@@ -4,8 +4,11 @@ import sys
 import extract_data as ed
 from keras.models import model_from_json
 import graph
-from models import mean_acc
+import keras.backend as K
 
+# Define metric
+def mean_acc(y_true, y_pred):
+    return K.mean(1-K.abs(y_true-y_pred)/y_true)
 
 model_file = (sys.argv[1]).split('.')[0]
 data_file = sys.argv[2]
