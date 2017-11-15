@@ -25,6 +25,11 @@ def extract_data_speed(n_history=10, n_sample=-1, filename="test2.dat"):
                 del v_arr[:]
                 continue
             data = json.loads(line)
+            if data['I'] == 0:
+                s_cnt = 0
+                del v_arr[:]
+                continue
+
             if "loc" in data and data['loc']['alt'] > 0:  # verify data
                 cnt += 1
                 s_cnt += 1
@@ -72,6 +77,12 @@ def extract_data_speed_diff(n_history=10, n_sample=-1, filename="test2.dat"):
                 del a_arr[:]
                 continue
             data = json.loads(line)
+            if data['I'] == 0:
+                s_cnt = 0
+                v_prev = 0
+                del a_arr[:]
+                continue
+
             if "loc" in data and data['loc']['alt'] > 0:  # verify data
                 cnt += 1
                 s_cnt += 1
@@ -126,6 +137,13 @@ def extract_data_velocity(n_history=10, n_sample=-1, filename="test2.dat"):
                 del v_z[:]
                 continue
             data = json.loads(line)
+            if data['I'] == 0:
+                s_cnt = 0
+                del v_arr[:]
+                del v_x[:]
+                del v_y[:]
+                del v_z[:]
+                continue
             if "loc" in data and data['loc']['alt'] > 0:  # verify data
                 cnt += 1
                 s_cnt += 1
@@ -226,19 +244,69 @@ def extract_data_seq(x_dim=1, y_dim=1):
 
     return x_train, y_train
 
+
+def extract_data_debug(n_history=10, n_sample=-1, filename="test2.dat"):
+    """
+
+    :param n_history: number of history it output
+    :param n_sample: number of samples (-1: for all data)
+    :param filename: filename
+    :return:
+    """
+
+    f = open("data/energy/"+filename)
+    cnt = 0
+    s_cnt = 0
+    v_arr = []
+    ret = np.empty((0, n_history + 1))
+
+    try:
+        for line in f:
+            if line[0] == "s":
+                s_cnt = 0
+                del v_arr[:]
+                continue
+            data = json.loads(line)
+            if data['I'] == 0:
+                s_cnt = 0
+                del v_arr[:]
+                continue
+
+            if "loc" in data and data['loc']['alt'] > 0:  # verify data
+                cnt += 1
+                s_cnt += 1
+                # get data
+                energy = -1 * data['V'] * data['I']
+                v = math.sqrt(pow(data['vx'], 2) + pow(data['vy'], 2))
+                v_arr.append(v)
+
+                if s_cnt > n_history:  # make sequence with history
+                    v_arr.pop(0)
+                    ret_arr = v_arr[:]
+                    ret_arr.append(energy/100000000.0)
+                    ret = np.append(ret, np.array([ret_arr]), axis=0)
+
+                if 0 < n_sample < cnt-n_history+1:  # cut with number of sample
+                    break
+
+    finally:
+        f.close()
+
+    return ret
+
 if __name__ == '__main__':
-    print "This is for test"
-    xy = extract_data_velocity(n_history=3, n_sample=3)
-    print xy.shape
-    print xy
+    # print "This is for test"
+    # xy = extract_data_velocity(n_history=3, n_sample=3)
+    # print xy.shape
+    # print xy
 
     print "SPEED"
-    xy = extract_data_speed(n_history=10, n_sample=1)
+    xy = extract_data_debug(n_history=10, n_sample=-1,filename="line.dat")
     print xy.shape
     print xy
 
-    print "DIFF"
-    xy = extract_data_speed_diff(n_history=10, n_sample=1)
-    print xy.shape
-    print xy
+    # print "DIFF"
+    # xy = extract_data_speed_diff(n_history=10, n_sample=1)
+    # print xy.shape
+    # print xy
 

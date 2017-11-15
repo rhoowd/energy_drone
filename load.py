@@ -4,15 +4,16 @@ import sys
 import extract_data as ed
 from keras.models import model_from_json
 import graph
+from models import mean_acc
 import keras.backend as K
 import numpy as np
 
 
-# Define metric
-def mean_acc(y_true, y_pred):
-    if y_true == 0:
-        return 0
-    return K.mean(1-K.abs(y_true-y_pred)/(y_true))
+# # Define metric
+# def mean_acc(y_true, y_pred):
+#     if y_true == 0:
+#         return 0
+#     return K.mean(1-K.abs(y_true-y_pred)/(y_true))
 
 model_file = (sys.argv[1]).split('.')[0]
 data_file = sys.argv[2]
@@ -50,6 +51,6 @@ print "MSE: " + str(score[1])
 
 est = loaded_model.predict(x_data)
 graph.draw_graph(x_data[:, -1], y_data, est)
-
-acc = (1-((np.abs(y_data - est)/est).mean()))*100
-print "ACC-: " + str(acc) + "%"
+#
+# acc = (1-((np.abs(y_data - est)/est).mean()))*100
+# print "ACC-: " + str(acc) + "%"
