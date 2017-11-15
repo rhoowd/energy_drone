@@ -7,8 +7,8 @@ FLAGS = config.flags.FLAGS
 input_file = str(FLAGS.f_n).split('.')[0]
 now = time.localtime()
 s_time = "%02d%02d-%02d%02d%02d" % (now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-filename = "r-"+input_file+"-"+str(FLAGS.n_h)+"-"+str(FLAGS.depth)+"-"\
-           +str(FLAGS.h_size)+"-"+str(FLAGS.n_e)+"-"+str(FLAGS.b_s)+"-"+s_time
+filename = "r-"+input_file+"-"+str(FLAGS.d_t)+"-"+str(FLAGS.n_h)+"-"+str(FLAGS.depth)\
+           + "-" + str(FLAGS.h_size)+"-"+str(FLAGS.n_e)+"-"+str(FLAGS.b_s)+"-"+s_time
 
 # === Logging setup === #
 logger = logging.getLogger('Energy')

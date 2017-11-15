@@ -4,6 +4,7 @@ import sys
 import extract_data as ed
 from keras.models import model_from_json
 import graph
+from models import mean_acc
 
 
 model_file = (sys.argv[1]).split('.')[0]
@@ -35,8 +36,9 @@ print("Loaded model from disk")
 
 # evaluate loaded model on test data
 # loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-loaded_model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mean_squared_error'])
+loaded_model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mean_squared_error', mean_acc])
 score = loaded_model.evaluate(x_data, y_data, verbose=0)
+print "ACC: " + str(score[2] * 100) + "%"
 print "MSE: " + str(score[1])
 
 est = loaded_model.predict(x_data)
