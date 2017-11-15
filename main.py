@@ -30,8 +30,6 @@ import extract_data as ed
 import log_result as log
 import models
 import graph
-
-from keras.models import Sequential
 from sklearn.model_selection import train_test_split
 
 
@@ -50,27 +48,28 @@ if __name__ == '__main__':
     x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=FLAGS.test_size, random_state=FLAGS.seed)
 
     # Create model
-    model = Sequential()
-    # models.base_model(model)
-    models.flexible_model(model)
+    model = models.flexible_model(FLAGS.n_h)
 
     # Start training
-    model.fit(x_train, y_train, validation_data=(x_test, y_test), nb_epoch=FLAGS.n_e, batch_size=FLAGS.b_s, verbose=FLAGS.verbose)
+    model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=FLAGS.n_e, batch_size=FLAGS.b_s, verbose=FLAGS.verbose)
 
     # Evaluate the model
     scores = model.evaluate(x_test, y_test)
+    log.logger.info("ACC(all):\t" + str(scores[2] * 100) + "%\t" + log.filename + " s" + str(FLAGS.seed) + "\t")
     log.logger.info("MSE(test):\t" + str(scores[1]) + "\t" + log.filename +" s"+ str(FLAGS.seed) + "\t")
     scores = model.evaluate(x_data, y_data)
-    log.logger.info("MSE(all):\t" + str(scores[1]) + "\t" + log.filename +" s" + str(FLAGS.seed) + "\t")
+    log.logger.info("ACC(all):\t" + str(scores[2] * 100) + "%\t" + log.filename + " s" + str(FLAGS.seed) + "\t")
+    log.logger.info("MSE(all):\t" + str(scores[1]) + "\t" + log.filename + " s" + str(FLAGS.seed) + "\t")
 
     # Save model
     model_json = model.to_json()
     with open("result/model/"+log.filename+".json", "w") as json_file:
         json_file.write(model_json)  # serialize model to JSON
     model.save_weights("result/model/"+log.filename+".h5")  # weight
-    print("Saved model done")
+    print("Save model ... done")
 
     # Make graph
     if FLAGS.graph == 1:
         est = model.predict(x_data)
         graph.draw_graph(x_data[:, -1], y_data, est)
+        print("Save graph ... done")
